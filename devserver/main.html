@@ -1,0 +1,633 @@
+<!DOCTYPE>
+<html>
+<head>
+<style type="text/css">
+
+html body{
+  font-family:'lato';
+}
+
+
+div.youFrame{
+  width:  228px;
+  height: 228px;
+  position:fixed;
+  top:  50%;
+  left: 50%;
+  margin: -114px 0px 0px -114px;
+  line-height:228px;
+  cursor:pointer;
+  transition:         margin 500ms ease, opacity 500ms ease;
+  -m-transition:      margin 500ms ease, opacity 500ms ease;
+  -o-transition:      margin 500ms ease, opacity 500ms ease;
+  -ms-transition:     margin 500ms ease, opacity 500ms ease;
+  -moz-transition:    margin 500ms ease, opacity 500ms ease;
+  -mz-transition:     margin 500ms ease, opacity 500ms ease;
+  -webkit-transition: margin 500ms ease, opacity 500ms ease;
+}
+div.youFrame div.you{
+  width:100%;
+  height:100%;
+  -webkit-border-radius: 100%;
+  -moz-border-radius:    100%;
+  border-radius:         100%;
+  box-shadow:inset 0 0 0 8px rgb(220,220,220);
+  text-align:center;
+  font-weight:300;
+  font-size:18px;
+  transition:         box-shadow 500ms ease;
+  -m-transition:      box-shadow 500ms ease;
+  -o-transition:      box-shadow 500ms ease;
+  -ms-transition:     box-shadow 500ms ease;
+  -moz-transition:    box-shadow 500ms ease;
+  -mz-transition:     box-shadow 500ms ease;
+  -webkit-transition: box-shadow 500ms ease;
+}
+div.youFrame.suspend_animation div.you{
+  transition:         none !important;
+  -m-transition:      none !important;
+  -o-transition:      none !important;
+  -ms-transition:     none !important;
+  -moz-transition:    none !important;
+  -mz-transition:     none !important;
+  -webkit-transition: none !important;
+}
+div.youFrame.loaded{
+  cursor:default;
+}
+div.youFrame.loading{
+  cursor:not-allowed;
+}
+div.youFrame:not(.loading):hover div.you{
+  box-shadow:inset 0 0 0 8px rgb(220,220,220), 0 0 0 12px rgba(220,220,220,0.5);
+}
+div.youFrame.loaded div.you{
+  box-shadow:inset 0 0 0 8px rgb(51,153,255) !important;
+}
+
+
+
+div.youFrame span{
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  color:transparent;
+  transition:         color 500ms ease;
+  -m-transition:      color 500ms ease;
+  -o-transition:      color 500ms ease;
+  -ms-transition:     color 500ms ease;
+  -moz-transition:    color 500ms ease;
+  -mz-transition:     color 500ms ease;
+  -webkit-transition: color 500ms ease;
+}
+div.youFrame span.shown{
+  color:rgb(51,51,51);
+  -m-transition:      color 500ms ease 500ms;
+  -o-transition:      color 500ms ease 500ms;
+  -ms-transition:     color 500ms ease 500ms;
+  -moz-transition:    color 500ms ease 500ms;
+  -mz-transition:     color 500ms ease 500ms;
+  -webkit-transition: color 500ms ease 500ms;
+}
+
+
+
+div.youFrame div.rotators{
+  top:0px;
+  left:0px;
+  position:absolute;
+  right:0px;
+  bottom:0px;
+  clip:rect(0px,228px,228px,114px);
+}
+div.youFrame div.rotators div{
+  top:0px;
+  left:0px;
+  position:absolute;
+  width:100%;
+  height:100%;
+  -webkit-border-radius: 100%;
+  -moz-border-radius:    100%;
+  border-radius:         100%;
+  box-shadow:inset 0 0 0 8px rgb(51,153,255);
+  clip:rect(0,114px,228px,0);
+}
+div.youFrame div.rotators.fill{
+  clip:auto;
+}
+div.youFrame div.rotators div.fill{
+  display:none;
+  -webkit-transform: rotate(180deg);
+  -ms-transform:     rotate(180deg);
+  -o-transform:      rotate(180deg);
+  -mz-transform:     rotate(180deg);
+  -moz-transform:    rotate(180deg);
+  transform:         rotate(180deg);
+}
+div.youFrame div.rotators.fill div.fill{
+  display:block;
+}
+div.youFrame.loaded div.rotators{
+  display:none;
+}
+
+
+div.youFrame.upper{
+  margin-top:-174px;
+  transition:         margin 500ms ease 500ms;
+  -m-transition:      margin 500ms ease 500ms;
+  -o-transition:      margin 500ms ease 500ms;
+  -ms-transition:     margin 500ms ease 500ms;
+  -moz-transition:    margin 500ms ease 500ms;
+  -mz-transition:     margin 500ms ease 500ms;
+  -webkit-transition: margin 500ms ease 500ms;
+}
+div.youFrame.pin{
+  margin-left:-300px;
+}
+
+
+
+
+
+div.devices{
+  display:none;
+  height:  80px;
+  width: 100%;
+  position:fixed;
+  top:  50%;
+  left: 0;
+  text-align:center;
+  opacity:0;
+  margin-top:162px;
+  transition:         all 500ms ease;
+  -m-transition:      all 500ms ease;
+  -o-transition:      all 500ms ease;
+  -ms-transition:     all 500ms ease;
+  -moz-transition:    all 500ms ease;
+  -mz-transition:     all 500ms ease;
+  -webkit-transition: all 500ms ease;
+}
+div.devices.visible{
+  margin-top: 102px;
+  opacity:1;
+  transition:         all 500ms ease 500ms;
+  -m-transition:      all 500ms ease 500ms;
+  -o-transition:      all 500ms ease 500ms;
+  -ms-transition:     all 500ms ease 500ms;
+  -moz-transition:    all 500ms ease 500ms;
+  -mz-transition:     all 500ms ease 500ms;
+  -webkit-transition: all 500ms ease 500ms;
+}
+div.devices div.device{
+  display:inline-block;
+  font-size:14px;
+  font-weight:300;
+  color:rgb(0,0,0);
+  line-height:18px;
+  padding:0px 12px;
+  cursor:pointer;
+  vertical-align:top;
+}
+div.devices div.device.nodevices{
+  cursor:default;
+}
+div.devices div.device.nodevices div.bubble{
+  background:rgb(220,220,220);
+  -webkit-border-radius: 100%;
+  -moz-border-radius:    100%;
+  border-radius:         100%;
+}
+div.devices div.device:hover div.bubble{
+  background-position-x:-30px;
+}
+div.devices div.device div.bubble{
+  margin:0px auto;
+  width:30px;
+  height:30px;
+}
+div.devices div.device div.text{
+  padding-top:8px;
+  max-width: 120px;
+}
+div.devices div.device div.distance{
+  font-size:12px;
+  color:rgb(102,102,102);
+}
+div.devices div.device div.bubble.refresh{
+  background-image: url(/images/refresh.png);
+  background-repeat: no-repeat;
+  margin: 15px;
+}
+
+
+div.pinframe{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-left: 206px;
+  margin-top: -34px;
+  transition:         opacity 500ms ease, margin-left 500ms ease;
+  -m-transition:      opacity 500ms ease, margin-left 500ms ease;
+  -o-transition:      opacity 500ms ease, margin-left 500ms ease;
+  -ms-transition:     opacity 500ms ease, margin-left 500ms ease;
+  -moz-transition:    opacity 500ms ease, margin-left 500ms ease;
+  -mz-transition:     opacity 500ms ease, margin-left 500ms ease;
+  -webkit-transition: opacity 500ms ease, margin-left 500ms ease;
+  display:none;
+  opacity:0;
+  color: rgb(51,51,51);
+}
+div.pinframe input{
+  font-weight:300;
+  font-size: 20px;
+  padding: 20px 32px;
+  width: 280px;
+  text-align: center;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid rgb(220,220,220);
+  box-shadow: inset 0px 3px 3px rgba(51,51,51,0.1);
+}
+div.pinframe.visible{
+  margin-left:20px;
+  opacity:1;
+}
+div.pinframe img.loading,
+div.pinframe img.failed{
+  position:absolute;
+  top:50%;
+  right:16px;
+  margin-top:-8px;
+  opacity:0.75;
+  opacity:0;
+  transition:         opacity 200ms ease;
+  -m-transition:      opacity 200ms ease;
+  -o-transition:      opacity 200ms ease;
+  -ms-transition:     opacity 200ms ease;
+  -moz-transition:    opacity 200ms ease;
+  -mz-transition:     opacity 200ms ease;
+  -webkit-transition: opacity 200ms ease;
+}
+div.pinframe.connecting img.loading{
+  opacity:1;
+}
+div.pinframe.failed img.failed{
+  opacity:1;
+}
+
+
+div.css3{
+  position:fixed;
+  top:0px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  overflow:hidden;
+  display:none;
+  -webkit-perspective: 800px;
+  -ms-perspective:     800px;
+  perspective:         800px;
+  -moz-perspective:    800px;
+  -ms-perspective-origin:    50% 50%;
+  -webkit-perspective-origin:50% 50%;
+  -moz-perspective-origin:   50% 50%;
+  perspective-origin:        50% 50%;
+  transition:         opacity 500ms ease;
+  -m-transition:      opacity 500ms ease;
+  -o-transition:      opacity 500ms ease;
+  -ms-transition:     opacity 500ms ease;
+  -moz-transition:    opacity 500ms ease;
+  -mz-transition:     opacity 500ms ease;
+  -webkit-transition: opacity 500ms ease;
+  opacity:0;
+  background: url(/images/dome.png) #4f7ee9;
+  background-position: bottom center;
+  -webkit-background-size: auto 100%;
+  -moz-background-size: auto 100%;
+  -o-background-size: auto 100%;
+  -ms-background-size: auto 100%;
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+}
+div.css3 div.blueprint{
+  position:absolute;
+  top:50%;
+  left:50%;
+  margin-top:-103px;
+  margin-left:-400px;
+  width:800px;
+  height:207px;
+  background:url(/images/blueprint.png) no-repeat;
+  -webkit-transform: rotateX(0deg) rotateY(0deg);
+  -moz-transform:    rotateX(0deg) rotateY(0deg);
+  -ms-transform:     rotateX(0deg) rotateY(0deg);
+  transform:         rotateX(0deg) rotateY(0deg);
+}
+
+
+
+
+
+</style>
+<meta charset="UTF-8" NAME="Author" CONTENT="Hunter Larco" />
+<title>Jiro Demo</title>
+<link rel="stylesheet" type="text/css" href="/resources/CSS/Resets.css"/>
+<link rel="stylesheet" type="text/css" href="/resources/CSS/Fonts.css"/>
+<script type="text/javascript" src="/_ah/channel/jsapi"></script>
+<script type="text/javascript" src="/resources/JS/Jiro.js"></script>
+</head>
+<body>
+
+
+
+<div class='youFrame' id='BEGIN'>
+  <div class='you'><span class='shown' id='begin1'>Find Devices</span><span id='begin2'></span></div>
+  <div class='rotators'><div id='ROTR'></div><div class='fill'></div></div>
+</div>
+<div class='devices' id='DEVICES'></div>
+<div class='pinframe' id='PINFRAME'>
+  <input type='text' id='PININPUT' maxlength='4' placeholder='0000'/>
+  <img src='/images/loading.gif' class='loading'/>
+  <img src='/images/error.png' class='failed'/>
+</div>
+<div class='css3' id='CANVAS'>
+  <div class='blueprint' id='LOGO'></div>
+</div>
+
+
+
+<script type="text/javascript">
+(function(){
+  
+  
+  function LoadIDs(){
+    function Recurse(obj){
+      for(var name in obj){
+        if(obj[name].constructor==Object){
+          Recurse(obj[name]);
+          continue;
+        }
+        obj[name] = document.getElementById(obj[name]);
+        obj[name].removeAttribute('id');
+      }
+    }
+    Recurse(ids);
+    console.log('HTML IDs Loaded');
+  }
+  
+  var ids = {
+    devices: 'DEVICES',
+    begin: 'BEGIN',
+    loadingBar: 'ROTR',
+    beginText: {
+      t1: 'begin1',
+      t2: 'begin2'
+    },
+    pinframe: 'PINFRAME',
+    pin: 'PININPUT',
+    canvas: 'CANVAS',
+    logo: 'LOGO'
+  }
+  
+  function SetLoadingPercent(percent){
+    var piece1 = 360*percent,
+        fill = piece1>=180?true:false;
+    var rotation = [
+      "-webkit-transform:rotate(deg);",
+      "-ms-transform:rotate(deg);",
+      "-o-transform:rotate(deg);",
+      "-mz-transform:rotate(deg);",
+      "-moz-transform:rotate(deg);",
+      "transform:rotate(deg);"
+    ].join("").replace(/deg/g,piece1+'deg');
+    ids.loadingBar.setAttribute('style',rotation);
+    ids.loadingBar.parentElement.setAttribute('class','rotators'+(fill?' fill':''));
+  }
+  
+  function LoadHost(){
+    ids.begin.setAttribute('class','youFrame loading');
+    var iShift = 0, loaded = false;
+    host.addEventListener('connect', function(){
+      console.log('Host Loaded');
+      if(loaded){
+        SetLoadingPercent(0.5);
+        LoadDevices();
+      }else{
+        iShift = 2;
+      }
+    });
+    host.addEventListener('connecterror', function(event){
+      console.warn('Failed To Connect Host');
+      event.detail.retry();
+    });
+    host.connect();
+    for(var i=0; i<=98; i++){
+      setTimeout((function(){
+        SetLoadingPercent((this.i+iShift)/100*0.5);
+      }).bind({i:i}), i*20);
+    }
+    setTimeout(function(){
+      loaded = true;
+      if(iShift==2) LoadDevices();
+    }, 20*98);
+  }
+  
+  function LoadDevices(){
+    var iShift = 0, loaded = false;
+    host.addEventListener('search', function(){
+      console.log('Devices Located');
+      if(loaded){
+        SetLoadingPercent(1);
+        EnterDeviceView();
+      }else{
+        iShift = 2;
+      }
+    });
+    host.addEventListener('searcherror', function(event){
+      console.warn('Failed To Locate Devices');
+      event.detail.retry();
+    });
+    host.locateDevices({
+      'radius': 5
+    });
+    for(var i=0; i<=98; i++){
+      setTimeout((function(){
+        SetLoadingPercent((this.i+iShift)/100*0.5+0.5);
+      }).bind({i:i}), i*20);
+    }
+    setTimeout(function(){
+      loaded = true;
+      if(iShift==2) EnterDeviceView();
+    }, 20*98);
+  }
+  
+  function EnterDeviceView(){
+    BuildDeviceMenu();
+    setTimeout(TransitionToSelectingDevice, 0);
+  }
+  
+  function TransitionToSelectingDevice(){
+    loading = false;
+    ids.begin.setAttribute('class','youFrame loaded unselectable suspend_animation');
+    setTimeout(function(){
+      ids.begin.setAttribute('class','youFrame loaded upper unselectable');
+      ids.devices.setAttribute('class','devices visible');
+    },0);
+    if(!refreshing) SwapButtonText('Select A Device');
+  }
+
+  function BuildDeviceMenu(){
+    ids.devices.innerHTML = '';
+    for(var i=0,device; device=host.devices.all()[i++];){
+      var HTML = document.createElement('div');
+      HTML.setAttribute('class','device');
+      var image = device.model=='iPad'?'ipad':(device.model=='iPhone'?'iphone':'generic');
+      HTML.innerHTML = [
+        "\<div class='bubble' style='background-image:url(/images/"+image+".png);'>\</div>",
+        "\<div class='text'>",
+          "\<div class='name'>"+device.name+"\</div>",
+          // "\<div class='distance'>"+MileDistanceToLabel(device.distance)+"\</div>",
+          "\<div class='distance'>"+device.model+"\</div>",
+        "\</div>"
+      ].join('');
+      HTML.addEventListener('click', DeviceSelectEvent.bind({device:device}));
+      ids.devices.appendChild(HTML);
+    }
+    if(host.devices.count()==0){
+      var HTML = document.createElement('div');
+      HTML.setAttribute('class','device nodevices');
+      HTML.innerHTML = [
+        '\<div class="bubble">\</div>',
+        '\<div class="text">',
+          '\<div class="distance">No Local Devices\<br>Found\</div>',
+        '\</div>'
+      ].join('');
+      ids.devices.appendChild(HTML);
+    }
+    var refreshButton = document.createElement('div');
+    refreshButton.setAttribute('class','device');
+    refreshButton.innerHTML = '\<div class="bubble refresh">\</div>';
+    refreshButton.addEventListener('click', RefreshDeviceList);
+    ids.devices.appendChild(refreshButton);
+    ids.devices.style.display = 'block';
+  }
+  
+  var selectedDevice;
+  function DeviceSelectEvent(){
+    SwapButtonText("Enter The Device's Pin");
+    selectedDevice = this.device;
+    ids.devices.setAttribute('class','devices');
+    ids.begin.setAttribute('class','youFrame loaded');
+    setTimeout(function(){
+      ids.devices.style.display = 'none';
+      ids.begin.setAttribute('class','youFrame loaded pin');
+      ids.pinframe.style.display = 'block';
+      setTimeout(function(){
+        ids.pinframe.setAttribute('class','pinframe visible');
+      },0);
+    },550);
+  }
+  
+  var refreshing = false;
+  function RefreshDeviceList(){
+    refreshing = true;
+    console.log('Refreshing The Device List');
+    ids.devices.setAttribute('class','devices');
+    setTimeout(function(){
+      host.locateDevices({
+        radius: 5
+      });
+    },550);
+  }
+  
+  var swapnum = 1;
+  function SwapButtonText(text){
+    var newswap = swapnum==1?2:1;
+    ids.beginText['t'+newswap].innerHTML = text;
+    ids.beginText['t'+newswap].setAttribute('class','shown');
+    ids.beginText['t'+swapnum].setAttribute('class','');
+    swapnum = newswap;
+  }
+  
+  function PinSuccess(event){
+    console.log('Pin Accepted');
+    ids.pinframe.setAttribute('class','pinframe connecting visible');
+    event.device.onmessage = OnSocketMessage;
+    setTimeout(InitializeDemo, 750);
+  }
+  function PinError(event){
+    console.warn('Pin Confirmation Failed');
+    ids.pin.disabled = false;
+    ids.pin.focus();
+    ids.pinframe.setAttribute('class','pinframe visible failed');
+  }
+  
+  function PinKeyUp(){
+    ids.pinframe.setAttribute('class','pinframe visible');
+    if(ids.pin.value.length!=4) return;
+    ids.pin.disabled = true;
+    selectedDevice.connect(ids.pin.value);
+  }
+  
+  function OnSocketMessage(event){
+    var y = event.x,
+        x = event.y;
+    var rotation = [
+      "-webkit-transform: rotateX("+x+"rad) rotateY("+y+"rad);",
+      "-moz-transform:    rotateX("+x+"rad) rotateY("+y+"rad);",
+      "-ms-transform:     rotateX("+x+"rad) rotateY("+y+"rad);",
+      "transform:         rotateX("+x+"rad) rotateY("+y+"rad);"
+    ].join('');
+    ids.logo.setAttribute('style', rotation);
+  }
+  
+  function InitializeDemo(){
+    console.log('Begining Demo');
+    ids.pinframe.style.opacity = 0;
+    ids.begin.style.opacity = 0;
+    setTimeout(function(){
+      ids.pinframe.style.display = 'none';
+      ids.begin.style.display = 'none';
+      ids.canvas.style.display = 'block';
+      setTimeout(function(){
+        ids.canvas.style.opacity = 1;
+      },0);
+    }, 550);
+  }
+  
+  
+  
+  
+  
+  
+  var host = new Jiro.Host();
+  host.addEventListener('deviceconnect', PinSuccess);
+  host.addEventListener('deviceconnecterror', PinError);
+  LoadIDs();
+  ids.begin.addEventListener('click',LoadHost,false);
+  ids.pin.addEventListener('keyup',PinKeyUp,false);
+  
+  
+  
+  
+  
+  
+  /*
+  function MileDistanceToLabel(dist){
+    if(dist>=1)
+      return Math.round(dist*10)/10+' miles away';
+      dist *= 5280;// conversion to feet
+    if(dist>100)
+      return Math.round(dist/100)*100+' feet away';
+    return 'withing 100 feet';
+  }
+  */
+  
+  
+})();
+</script>
+</body>
+</html>
