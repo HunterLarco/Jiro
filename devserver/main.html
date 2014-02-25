@@ -410,7 +410,7 @@ div.css3 div.blueprint{
   function LoadHost(){
     ids.begin.setAttribute('class','youFrame loading');
     var iShift = 0, loaded = false;
-    host.addEventListener('connect', function(){
+    host.addEventListener(Jiro.Events.Host.ONCONNECT, function(){
       console.log('Host Loaded');
       if(loaded){
         SetLoadingPercent(0.5);
@@ -419,7 +419,7 @@ div.css3 div.blueprint{
         iShift = 2;
       }
     });
-    host.addEventListener('connecterror', function(event){
+    host.addEventListener(Jiro.Events.Host.ONCONNECTERROR, function(event){
       console.warn('Failed To Connect Host');
       event.detail.retry();
     });
@@ -437,7 +437,7 @@ div.css3 div.blueprint{
   
   function LoadDevices(){
     var iShift = 0, loaded = false;
-    host.addEventListener('search', function(){
+    host.addEventListener(Jiro.Events.Host.ONLOCATION, function(){
       console.log('Devices Located');
       if(loaded){
         SetLoadingPercent(1);
@@ -446,7 +446,7 @@ div.css3 div.blueprint{
         iShift = 2;
       }
     });
-    host.addEventListener('searcherror', function(event){
+    host.addEventListener(Jiro.Events.Host.ONLOCATIONERROR, function(event){
       console.warn('Failed To Locate Devices');
       event.detail.retry();
     });
@@ -519,6 +519,8 @@ div.css3 div.blueprint{
   function DeviceSelectEvent(){
     SwapButtonText("Enter The Device's Pin");
     selectedDevice = this.device;
+    selectedDevice.addEventListener('connect', PinSuccess);
+    selectedDevice.addEventListener('connecterror', PinError);
     ids.devices.setAttribute('class','devices');
     ids.begin.setAttribute('class','youFrame loaded');
     setTimeout(function(){
@@ -604,8 +606,6 @@ div.css3 div.blueprint{
   
   
   var host = new Jiro.Host();
-  host.addEventListener('deviceconnect', PinSuccess);
-  host.addEventListener('deviceconnecterror', PinError);
   LoadIDs();
   ids.begin.addEventListener('click',LoadHost,false);
   ids.pin.addEventListener('keyup',PinKeyUp,false);

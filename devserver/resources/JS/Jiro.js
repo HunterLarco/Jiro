@@ -1,72 +1,23 @@
 (function(){
-  
-  window.Jiro = new Object();
-  Jiro.Response = Response;
-  Jiro.Host = Host;
+
   
   
-  
-  
-  
-  
-  
-  
-  
-  function Response(){
-    var self = this;
-    
-    // -------------------- PRIVATE METHODS -------------------- \\
-    
-    function IsDefined(variable){
-      var undefined;
-      return variable != undefined && variable != null;
+  var Events = {
+    Host: {
+      ONCONNECT:         'connect',
+      ONDISCONNECT:      'disconnect',
+      ONCONNECTERROR:    'connecterror',
+      ONDISCONNECTERROR: 'disconnecterror',
+      ONLOCATION:        'location',
+      ONLOCATIONERROR:   'locationerror'
+    },
+    Device: {
+      ONCONNECT:         'connect',
+      ONDISCONNECT:      'disconnect',
+      ONCONNECTERROR:    'connecterror',
+      ONDISCONNECTERROR: 'disconnecterror'
     }
-    
-    // -------------------- CONSTRUCTOR -------------------- \\
-    
-    function Constructor(stat, data){
-      if(IsDefined(stat))
-    		Object.defineProperty(self,"stat",{
-          value:stat,
-          writable:false,
-          enumerable:true,
-          configurable:false
-        });
-      if(typeof data == 'object')
-        for(var key in data){
-          if(IsDefined(stat))
-        		Object.defineProperty(self,key,{
-              value:data[key],
-              writable:false,
-              enumerable:true,
-              configurable:false
-            });
-        }
-    }
-    Constructor.apply(self, arguments);
-  }
-  
-  Response.CODES = {
-    '-1': 'Unknown response code',
-     '1': 'Invalid variable type',
-     '2': 'Event listener is not defined',
-     '3': 'Event listener cannot be removed: The provided method has not been added to the event listener',
-     '4': 'Invalid filter parameter'
-  }
-  
-  Response.throw = function ThrowResponse(code){
-    if(!Response.CODES[code]) code = -1;
-    return new Response('fail', {
-      'code': code,
-      'message': Response.CODES[code]
-    });
-  }
-  
-  Response.reply = function ReplyResponse(data){
-    return new Response('ok', data||{});
-  }
-  
-  
+  };
   
   
   
@@ -82,28 +33,41 @@
     // -------------------- PUBLIC METHODS -------------------- \\
     
     self.add = function AddEventListener(name, funct){
-      if(typeof name != 'string' || typeof funct != 'function') return Response.throw(1);
+      if(typeof name != 'string' || typeof funct != 'function'){
+        console.warn('Invalid variable type: Function aborted');
+        return;
+      }
       if(!eventListeners[name]) eventListeners[name] = [];
       eventListeners[name].push(funct);
-      return Response.reply();
     }
     
     self.remove = function RemoveEventListener(name, funct){
-      if(typeof name != 'string' || typeof funct != 'function') return Response.throw(1);
-      if(!eventListeners[name]) return Response.throw(2);
+      if(typeof name != 'string' || typeof funct != 'function'){
+        console.warn('Invalid variable type: Function aborted');
+        return;
+      }
+      if(!eventListeners[name]){
+        console.warn('Event listener "'+name+'" is not defined');
+        return;
+      };
       var index = eventListeners[name].indexOf(funct);
-      if(index<0) return Response.throw(3);
+      if(index<0){
+        console.warn('Event listener "'+name+'" cannot be removed: The provided method has not been added to the listener');
+        return;
+      }
       eventListeners[name].splice(index, 1);
-      return Response.reply();
     }
     
     self.run = function RunEventListener(name, event){
-      if(typeof name != 'string') return Response.throw(1);
-      if(!eventListeners[name]) return Response.throw(2);
-      for(var i=0,listener; listener=eventListeners[name][i++];){
-        listener(event);
+      if(typeof name != 'string'){
+        console.warn('Invalid variable type: Function aborted');
+        return;
+      };
+      if(!eventListeners[name]){
+        console.warn('Event listener "'+name+'" is not defined');
+        return;
       }
-      return Response.reply()
+      for(var i=0,listener; listener=eventListeners[name][i++];) listener(event);
     }
     
     // -------------------- PRIVATE DATA -------------------- \\
@@ -119,14 +83,16 @@
   
   
   
-  // FIXME: chaining issue with response
+  
+  
   function Query(){
     var self = this;
     
     // -------------------- PUBLIC METHODS -------------------- \\
     
     self.all = function All(){
-      return data;
+      // the .slice() copies the array, pass by value, not reference
+      return data.slice();
     }
     
     self.get = function Get(){
@@ -146,17 +112,18 @@
       if(typeof arg1 == 'object'){
         var query = self;
         for(var key in arg1){
-          query = query.filter(key, arg1[key]);
-          if(query.stat=='fail') return query;
-          query = query.query;
+          var querytry = query.filter(key, arg1[key]);
+          if(!querytry) continue;
+          query = querytry;
         }
-        return Response.reply({
-          'query': query
-        });
+        return query;
       }else if(typeof arg1 == 'string'){
         var tagRegExp = /^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(=|>|<|!=|<=|>=)\s*$/,
             match = tagRegExp.exec(arg1);
-        if(!match) return Response.throw(4);
+        if(!match){
+          console.warn('Invalid Query filter parameter: Skipping filter "'+arg1+'"; Results may be incomplete');
+          return;
+        };
         var variable = match[1],
             operator = match[2],
             output = [];
@@ -170,11 +137,9 @@
             if(operator=='>=') if(obj[variable] >= arg2) output.push(obj);
           }catch(e){}
         }
-        return Response.reply({
-          'query': new Query(output)
-        });
+        return new Query(output);
       }
-      return Response.throw(1);
+      console.warn('Invalid variable type: Function aborted');
     }
     
     // -------------------- PRIVATE DATA -------------------- \\
@@ -183,12 +148,14 @@
     
     // -------------------- CONSTRUCTOR -------------------- \\
     
-    function Constructor(querydata){
+    !function Constructor(querydata){
       if(querydata == null || querydata == undefined) querydata = [];
-      if(querydata.constructor != Array) return Response.throw(1);
+      if(querydata.constructor != Array){
+        console.warn('Invalid Query data: Creating an empty query');
+        querydata = [];
+      };
       data = querydata;
-    }
-    Constructor.apply(self, arguments);
+    }.apply(self, arguments);
   }
   
   
@@ -268,14 +235,207 @@
   
   
   
+  function Device(){
+    var self = this;
+  
+    // -------------------- PRIVATE METHODS -------------------- \\
+    
+    function ClearObject(){
+      for(prop in self){
+        if(self.hasOwnProperty(prop)){
+          delete self[prop];
+        }
+      }
+    }
+    
+    function ResetState(){
+      ClearObject();
+      self.addEventListener = AddEventEventListener;
+      self.removeEventListener = RemoveEventListener;
+      self.connect = Connect;
+      self.__defineSetter__('onmessage', OnMessageSetter);
+      self.__defineGetter__('onmessage', OnMessageGetter);
+      self.__defineGetter__('CONNECTED', ConnectedGetter);
+      SetMetadata();
+    }
+    
+    function AddEventEventListener(name, funct){
+      eventListener.add(name, funct);
+    }
+    
+    function RemoveEventListener(name, funct){
+      eventListener.remove(name, funct);
+    }
+    
+    function ConnectedGetter(){
+      return connected;
+    }
+    
+    function OnMessageGetter(){
+      return onmessage
+    }
+    
+    function OnMessageSetter(funct){
+      if(typeof funct != 'function'){
+        console.warn('Invalid variable type');
+        return;
+      };
+      onmessage = funct;
+    }
+    
+    function Connect(pin){
+      if(typeof pin != 'string' && !pinmemory){
+        console.warn('Invalid variable type: Function aborted');
+        return;
+      };
+      var request = new Request('/jirohandle/devices/connect');
+      function OnSuccess(event){
+        pinmemory = pin;
+        ChangeStateToConnected();
+        eventListener.run(Events.Device.ONCONNECT, {device:self});
+      }
+      function OnError(event){
+        var _event = new CustomEvent(
+        	"DeviceConnectionErrorEvent",{
+        		detail: {
+              retry: event.retry,
+              message: event.message,
+            },
+        		bubbles: true,
+        		cancelable: true
+        });
+        eventListener.run(Events.Device.ONCONNECTERROR, event);
+      }
+      request.send({
+        'pin': !!pinmemory ? pinmemory : pin,
+        'identifier': self.identifier,
+        'host': host.getIdentifier()
+      }, OnSuccess, OnError);
+    }
+  
+    function ChangeStateToConnected(){
+      ClearObject();
+      self.addEventListener = AddEventEventListener;
+      self.removeEventListener = RemoveEventListener;
+      self.__defineSetter__('onmessage', OnMessageSetter);
+      self.__defineGetter__('onmessage', OnMessageGetter);
+      self.__defineGetter__('CONNECTED', ConnectedGetter);
+      self.disconnect = Disconnect;
+      connected = true;
+    }
+    
+    function Disconnect(){
+      var request = new Request('/jirohandle/devices/disconnect');
+      function OnSuccess(event){
+        ResetState();
+        eventListener.run(Events.Device.ONDISCONNECT);
+      }
+      function OnError(event){
+        var _event = new CustomEvent(
+        	"DeviceDisconnectionErrorEvent",{
+        		detail: {
+              retry: event.retry,
+              message: event.message,
+            },
+        		bubbles: true,
+        		cancelable: true
+        });
+        eventListener.run(Events.Device.ONDISCONNECTERROR, event);
+      }
+      request.send({
+        'identifier': host.getIdentifier(),
+        'device': self.identifier
+      }, OnSuccess, OnError);
+    }
+    
+    function SetMetadata(){
+  		Object.defineProperty(self,"identifier",{
+        value:metadata.identifier,
+        writable:false,
+        enumerable:true,
+        configurable:false
+      });
+  		Object.defineProperty(self,"name",{
+        value:metadata.name,
+        writable:false,
+        enumerable:true,
+        configurable:false
+      });
+  		Object.defineProperty(self,"distance",{
+        value:metadata.distance,
+        writable:false,
+        enumerable:true,
+        configurable:false
+      });
+  		Object.defineProperty(self,"model",{
+        value:metadata.model,
+        writable:false,
+        enumerable:true,
+        configurable:false
+      });
+    }
+  
+    // -------------------- PRIVATE DATA -------------------- \\
+  
+    var connected = false, pinmemory, onmessage, metadata, host,
+        eventListener = new EventListener();
+  
+    // -------------------- CONSTRUCTOR -------------------- \\
+    !function Constructor(handleResponse, hostinstance){
+      metadata = handleResponse;
+      host = hostinstance;
+      ResetState();
+    }.apply(self, arguments);
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   function Host(){
     var self = this;
     
-    // -------------------- PUBLIC METHODS -------------------- \\
+    // -------------------- PRIVATE METHODS -------------------- \\
     
-    self.connect = function ConnectHost(){
+    function ClearObject(){
+      for(prop in self){
+        if(self.hasOwnProperty(prop)){
+          delete self[prop];
+        }
+      }
+    }
+    
+    function ResetState(){
+      ClearObject();
+      self.connect = Connect;
+      self.addEventListener = AddEventEventListener;
+      self.removeEventListener = RemoveEventListener;
+  		self.__defineGetter__('CONNECTED', ConnectionGetter);
+    }
+    
+    function AddEventEventListener(name, funct){
+      eventListener.add(name, funct);
+    }
+    
+    function RemoveEventListener(name, funct){
+      eventListener.remove(name, funct);
+    }
+    
+    function ConnectionGetter(){
+		  return connected;
+		}
+    
+    function DevicesGetter(){
+		  return devices;
+		}
+    
+    function Connect(){
       var request = new Request('/jirohandle/login/host');
       function OnSuccess(event){
         identifier = event.identifier;
@@ -292,174 +452,38 @@
         		bubbles: true,
         		cancelable: true
         });
-        eventListener.run('connecterror', _event);
+        eventListener.run(Events.Host.ONCONNECTERROR, _event);
       }
       request.send({}, OnSuccess, OnError);
-      return Response.reply();
     }
     
-    self.addEventListener = function(name, funct){
-      return eventListener.add(name, funct);
-    }
-    
-    self.removeEventListener = function(name, funct){
-      return eventListener.remove(name, funct);
-    }
-    
-		self.__defineGetter__('CONNECTED', function ConnectionGetter(){
-		  return connected;
-		});
-    
-    
-    
-    
-    // -------------------- PRIVATE METHODS -------------------- \\
-    
-    function Device(){
-      var self = this;
-    
-      // -------------------- PUBLIC METHODS -------------------- \\
-    
-      self.connect = Connect;
-    
-      self.__defineSetter__('onmessage', function(funct){
-        if(typeof funct != 'function') return Response.throw(1);
-        onmessagehandlers[self.identifier] = funct;
-        return Response.reply();
-      })
-      self.__defineGetter__('onmessage', function(){
-        return onmessagehandlers[self.identifier];
-      })
-    
-      self.__defineGetter__('CONNECTED', function(){
-        return connected;
-      });
-    
-      // -------------------- PRIVATE METHODS -------------------- \\
-      
-      function Connect(pin){
-        if(typeof pin != 'string' && !pinmemory) return Response.throw(1);
-        var request = new Request('/jirohandle/devices/connect');
-        function OnSuccess(event){
-          pinmemory = pin;
-          InitializeDevice();
-          eventListener.run('deviceconnect', {device:self});
-        }
-        function OnError(event){
-          var _event = new CustomEvent(
-          	"DeviceConnectionErrorEvent",{
-          		detail: {
-                retry: event.retry,
-                message: event.message,
-              },
-          		bubbles: true,
-          		cancelable: true
-          });
-          eventListener.run('deviceconnecterror', event);
-        }
-        request.send({
-          'pin': !!pinmemory ? pinmemory : pin,
-          'identifier': self.identifier,
-          'host': identifier
-        }, OnSuccess, OnError);
-        return Response.reply();
-      }
-    
-      function InitializeDevice(){
-        connected = true;
-        delete self.connect;
-        self.disconnect = Disconnect;
-      }
-      
-      function ResetDevice(){
-        connected = false;
-        self.connect = Connect;
-        delete self.disconnect;
-      }
-    
-      function Disconnect(){
-        var request = new Request('/jirohandle/devices/disconnect');
-        function OnSuccess(event){
-          ResetDevice();
-          eventListener.run('devicedisconnect');
-        }
-        function OnError(event){
-          var _event = new CustomEvent(
-          	"DeviceDisconnectionErrorEvent",{
-          		detail: {
-                retry: event.retry,
-                message: event.message,
-              },
-          		bubbles: true,
-          		cancelable: true
-          });
-          eventListener.run('devicedisconnecterror', event);
-        }
-        request.send({
-          'identifier': identifier,
-          'device': self.identifier
-        }, OnSuccess, OnError);
-      }
-    
-      // -------------------- PRIVATE DATA -------------------- \\
-    
-      var connected = false, pinmemory;
-    
-      // -------------------- CONSTRUCTOR -------------------- \\
-      function Constructor(handleResponse){
-    		Object.defineProperty(self,"identifier",{
-          value:handleResponse.identifier,
-          writable:false,
-          enumerable:true,
-          configurable:false
-        });
-    		Object.defineProperty(self,"name",{
-          value:handleResponse.name,
-          writable:false,
-          enumerable:true,
-          configurable:false
-        });
-    		Object.defineProperty(self,"distance",{
-          value:handleResponse.distance,
-          writable:false,
-          enumerable:true,
-          configurable:false
-        });
-    		Object.defineProperty(self,"model",{
-          value:handleResponse.model,
-          writable:false,
-          enumerable:true,
-          configurable:false
-        });
-      }
-      Constructor.apply(self, arguments);
-    }
-    
-    function InitializeHost(){
+    function ChangeToConnectedState(){
       // Upon connection, add all pertinant methods to the Host
-      connected = true;
-  		self.__defineGetter__('devices', function DevicesGetter(){
-  		  return devices;
-  		});
-      delete self.connect;
+      ClearObject();
+      self.addEventListener = AddEventEventListener;
+      self.removeEventListener = RemoveEventListener;
+  		self.__defineGetter__('CONNECTED', ConnectionGetter);
+  		self.__defineGetter__('devices', DevicesGetter);
       self.disconnect = Disconnect;
       self.locateDevices = LocateDevices;
+      connected = true;
     }
     
     function OnSocketOpen(){
-      InitializeHost();
-      eventListener.run('connect');
+      ChangeToConnectedState();
+      eventListener.run(Events.Host.ONCONNECT);
     }
     
     function OnSocketMessage(event){
       var event = JSON.parse(event.data),
-          device = event.identifier;
-      if(!!onmessagehandlers[device]) onmessagehandlers[device](event.data);
+          deviceID = event.identifier,
+          device = devices.filter('identifier =', deviceID).get();
+      if(!!device) device.onmessage(event.data);
     }
     
     function OnSocketClose(){
-      console.warn('The host connection has been distrupted: It will stop working until reconnected.');
-      // TODO: write the reconnection version of the host
+      console.error('The host connection has been disconnected');
+      ResetState();
     }
     
     function StartSocket(){
@@ -474,19 +498,15 @@
     function Disconnect(){
       var request = new Request('/jirohandle/login/hostdisconnect');
       function OnSuccess(){
-        eventListener.run('disconnect');
+        ResetState();
+        eventListener.run(Events.Host.ONDISCONNECT);
       }
       function OnError(){
-        eventListener.run('disconnecterror');
+        eventListener.run(Events.Host.ONDISCONNECTERROR);
       }
       request.send({
         identifier: identifier
       }, OnSuccess, OnError);
-    }
-    
-    function SetDeviceOnMessageListener(identifier, funct){
-      // indentifier and funct are garaunteed to be valid
-      onmessagehandlers[identifier] = funct;
     }
     
     function LocateDevices(options){
@@ -495,6 +515,7 @@
           radius = typeof options.radius == 'number' ? options.radius : null,
           model = typeof options.model == 'string' ? options.model : null;
       function OnSuccess(event){
+        var newDevices = [];
         for(var i=0,device; device=event.devices[i++];){
           // checks duplicates
           var contained = false;
@@ -504,9 +525,13 @@
               break;
             }
           }
-          if(!contained) devices.all().push(new Device(device, SetDeviceOnMessageListener, identifier));
+          if(!contained) newDevices.push(new Device(device, PrivateHostMethods));
         }
-        eventListener.run('search');
+        devices = new Query(devices.all().concat(newDevices));
+        eventListener.run(Events.Host.ONLOCATION, {
+          devices: new Query(event.devices),
+          params: options
+        });
       }
       function OnError(event){
         var _event = new CustomEvent(
@@ -518,12 +543,16 @@
         		bubbles: true,
         		cancelable: true
         });
-        eventListener.run('searcherror', _event);
+        eventListener.run(Events.Host.ONLOCATIONERROR, _event);
       }
       request.send({
         radius: radius,
         model: model
       }, OnSuccess, OnError);
+    }
+    
+    function GetIdentifier(){
+      return identifier;
     }
     
     
@@ -534,19 +563,38 @@
         devices = new Query(),
         identifier,
         socket,
-        onmessagehandlers = {};
+        PrivateHostMethods = new Object();
     
     
     // -------------------- CONSTRUCTOR -------------------- \\
     
-    function Constructor(){
+    !function Constructor(){
       if(++hostcount>1) throw 'Only one host can be instanciated per webpage';
-    }
-    Constructor.apply(self, arguments);
+      ResetState();
+      PrivateHostMethods.getIdentifier = GetIdentifier;
+    }.apply(self, arguments);
   }
   
   // used to insure that only one host is created per webpage
   var hostcount = 0;
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  window.Jiro = new Object();
+  Jiro.Host = Host;
+  Jiro.Events = Events;
   
 })();
