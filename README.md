@@ -1,13 +1,11 @@
-Jiro
-====
+#Jiro
 
-Leap Motion type hand-gesture control with an iOS device - a MITBlueprint project.
+[Documentation](./documentation/Welcome.md)&ensp;·&ensp;[Implimentation](./documentation/GettingStarted.md)
 
-Team
-===
+> Jiro is a Leap Motion type hand-gesture framework that enables developers to use smart phones as leap motion-like devices in their web projects.
 
-|    Contributor    |   Contribution    |                         GitHub                        |                       Twitter                      |
-|:-----------------:|:-----------------:|:-----------------------------------------------------:|:--------------------------------------------------:|
-|   James Harnett   |  iOS  |     [jamesharnett](https://github.com/jamesharnett)   | [playbasegames](https://twitter.com/playbasegames) |
-|  Hunter Larco   | Web/Server |      [HunterLarco](https://github.com/HunterLarco)      | unknown |
-|  Ankitha Gangarapu   | Design |      [ankithag](https://github.com/ankithag)      | unknown |
+<br/>
+####Developers
+> Hunter John Larco - Frontend / Backend Web Developer<br/>
+> James Harnett - iOS Developer<br/>
+> Ankitha Gangarapu - Graphic Design
