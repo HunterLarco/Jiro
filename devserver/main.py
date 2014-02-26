@@ -1,7 +1,6 @@
 import webapp2
 import os
 from google.appengine.ext.webapp import template
-import Jiro
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -12,6 +11,5 @@ class MainHandler(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-              Jiro.handle,
               ('/.*', MainHandler)
           ], debug=True)

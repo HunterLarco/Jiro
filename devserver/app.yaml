@@ -13,6 +13,9 @@ handlers:
 - url: /resources
   static_dir: resources
 
+- url: /jirohandle/.*
+  script: Jiro.Handle.app
+
 - url: .*
   script: main.app
 
