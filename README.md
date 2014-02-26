@@ -1,6 +1,6 @@
 #Jiro
 
-[Documentation](./Documentation/Welcome.md)&ensp;·&ensp;[Implimentation](./Documentation/GettingStarted.md)
+[Documentation](./Documentation/API/Overview.md)&ensp;·&ensp;[Reference](./Documentation/API/Reference)
 
 > Jiro is a Leap Motion type hand-gesture framework that enables developers to use smart phones as leap motion-like devices in their web projects.
 
