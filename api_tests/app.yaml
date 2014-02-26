@@ -1,0 +1,15 @@
+application: meetjiro
+version: api
+runtime: python27
+threadsafe: true
+api_version: 1
+
+handlers:
+- url: /_ah/spi/.*
+  script: API.APPLICATION
+
+libraries:
+- name: pycrypto
+  version: latest
+- name: endpoints
+  version: 1.0
