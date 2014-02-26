@@ -9,7 +9,7 @@ The JiroAPI communicates with your server or the entry point to connect mobile d
 
 ###Downloading The Client
 
-Download [Jiro.js](/build/Jiro.js) and include it in your html.
+Download [Jiro.js](./Resources/Jiro.js) and include it in your html.
 ```html
 <script src='js/Jiro.js'></script>
 ```
